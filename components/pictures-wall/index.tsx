@@ -1,7 +1,8 @@
 import React from 'react';
 import { Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { UploadFile } from 'antd/es/upload/interface';
+import { UploadProps } from 'antd/es/upload/index';
+import { ModalProps } from 'antd/es/modal/index'
 
 function getBase64(file: File) {
   return new Promise((resolve, reject) => {
@@ -12,49 +13,12 @@ function getBase64(file: File) {
   });
 }
 
-class PicturesWall extends React.Component {
-  state = {
+class PicturesWall extends React.Component<{ upload: UploadProps, modal?: ModalProps }> {
+  state: any = {
     previewVisible: false,
     previewImage: '',
     previewTitle: '',
-    fileList: [
-      {
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-2',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-3',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-4',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-xxx',
-        percent: 50,
-        name: 'image.png',
-        status: 'uploading',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-      {
-        uid: '-5',
-        name: 'image.png',
-        status: 'error',
-      },
-    ],
+    fileList: [],
   };
 
   handleCancel = () => this.setState({ previewVisible: false });
@@ -71,9 +35,21 @@ class PicturesWall extends React.Component {
     });
   };
 
-  handleChange = ({ fileList } : { fileList: Array<UploadFile> }) => this.setState({ fileList });
+  handleChange = (info: any) => {
+    let fileList = [...info.fileList];
+    // Read from response and show file link
+    fileList = fileList.map(file => {
+      if (file.response) {
+        // Component will show file.url as link
+        file.url = file.response.url;
+      }
+      return file;
+    });
+    this.setState({ fileList });
+  }
 
   render() {
+    const { upload: uploadProps = {}, modal: modalProps = {}} = this.props;
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
     const uploadButton = (
       <div>
@@ -86,8 +62,8 @@ class PicturesWall extends React.Component {
         <Upload
           action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
           listType="picture-card"
-          // @ts-ignore
           fileList={fileList}
+          {...uploadProps}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
         >
@@ -97,6 +73,7 @@ class PicturesWall extends React.Component {
           visible={previewVisible}
           title={previewTitle}
           footer={null}
+          {...modalProps}
           onCancel={this.handleCancel}
         >
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
