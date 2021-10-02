@@ -13,13 +13,30 @@ function getBase64(file: File) {
   });
 }
 
-class PicturesWall extends React.Component<{ upload: UploadProps, modal?: ModalProps }> {
-  state: any = {
-    previewVisible: false,
-    previewImage: '',
-    previewTitle: '',
-    fileList: [],
-  };
+class PicturesWall extends React.Component<{ upload: any, modal?: ModalProps }, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      previewVisible: false,
+      previewImage: '',
+      previewTitle: '',
+      defaultFileListLoaded: false,
+      fileList: [],
+      notifyFileListReady: this.notifyFileListReady
+    };
+  }
+
+  static getDerivedStateFromProps(props: any, state: any) {
+    if (!state.defaultFileListLoaded && Array.isArray(props.upload.fileList) && props.upload.fileList.length) {
+      const fileList = state.fileList.concat(props.upload.fileList);
+      state.notifyFileListReady(fileList);
+      return {
+        defaultFileListLoaded: true,
+        fileList,
+      };
+    }
+    return null;
+  }
 
   handleCancel = () => this.setState({ previewVisible: false });
 
@@ -35,7 +52,22 @@ class PicturesWall extends React.Component<{ upload: UploadProps, modal?: ModalP
     });
   };
 
+  notifyFileListReady = (fileList: Array<any>): void => {
+    if (this.props.upload && this.props.upload.onFileListReady) {
+      this.props.upload.onFileListReady(fileList);
+    }
+  }
+
   handleChange = (info: any) => {
+    // Call the onChange callback function provided by user
+    if (this.props.upload.onChange) {
+      this.props.upload.onChange({
+        ...info
+      });
+    }
+
+    const { file : { status } } = info;
+
     let fileList = [...info.fileList];
     // Read from response and show file link
     fileList = fileList.map(file => {
@@ -45,11 +77,18 @@ class PicturesWall extends React.Component<{ upload: UploadProps, modal?: ModalP
       }
       return file;
     });
-    this.setState({ fileList });
+
+    this.setState({ fileList }, () => {
+      if (status === 'done' || status === 'removed') {
+        // call the onFileListReady callback function provided by user
+        this.notifyFileListReady(fileList.filter(file => file.status === 'done'));
+      }
+    });
   }
 
   render() {
-    const { upload: uploadProps = {}, modal: modalProps = {}} = this.props;
+    const { upload: uploadProps, modal: modalProps = {}} = this.props;
+    const { maxCount } = uploadProps;
     const { previewVisible, previewImage, fileList, previewTitle } = this.state;
     const uploadButton = (
       <div>
@@ -62,12 +101,12 @@ class PicturesWall extends React.Component<{ upload: UploadProps, modal?: ModalP
         <Upload
           action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
           listType="picture-card"
-          fileList={fileList}
           {...uploadProps}
+          fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
         >
-          {fileList.length >= 8 ? null : uploadButton}
+          { Number.isInteger(maxCount) && fileList.length >= maxCount ? null : uploadButton}
         </Upload>
         <Modal
           visible={previewVisible}
