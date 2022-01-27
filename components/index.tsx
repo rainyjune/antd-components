@@ -1,1 +1,0 @@
-export { default as PicturesWall } from './pictures-wall';

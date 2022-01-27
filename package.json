@@ -1,38 +1,48 @@
 {
-  "name": "antd-components",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@rainyjune/antd-components",
+  "version": "1.0.0-alpha2",
+  "description": "A react UI library based on Ant Design",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "webpack serve --open",
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rainyjune/antd-components.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "antd",
+    "ant design",
+    "react components"
+  ],
+  "author": "rainyjune<rainyjune@live.cn>",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rainyjune/antd-components/issues"
   },
   "homepage": "https://github.com/rainyjune/antd-components#readme",
   "devDependencies": {
-    "@types/react": "^17.0.24",
+    "@rollup/plugin-commonjs": "^21.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "@rollup/plugin-typescript": "^8.2.5",
+    "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.9",
     "css-loader": "^6.3.0",
-    "html-webpack-plugin": "^5.3.2",
     "less": "^4.1.1",
     "less-loader": "^10.0.1",
+    "rollup": "^2.58.0",
+    "rollup-plugin-dts": "^4.1.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.1",
+    "rollup-plugin-terser": "^7.0.2",
     "style-loader": "^3.3.0",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.4.3",
-    "webpack": "^5.55.1",
-    "webpack-cli": "^4.8.0",
-    "webpack-dev-server": "^4.3.0"
+    "typescript": "^4.4.3"
   },
-  "dependencies": {
+  "peerDependencies": {
     "antd": "^4.16.13",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
